@@ -36,9 +36,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-
 import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -49,11 +47,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-
-
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.UUID;
 
 /**
@@ -69,35 +63,17 @@ public class DeviceScanActivity extends ListActivity {
     private BluetoothLeService mBluetoothLeService;
 
     private static final int REQUEST_ENABLE_BT = 1;
+
     // Stops scanning after 10 seconds.
     private static final long SCAN_PERIOD = 10000;
-
-    private final static String TAG = DeviceControlActivity.class.getSimpleName();
-
-    public static final String EXTRAS_DEVICE_NAME = "DEVICE_NAME";
-    public static final String EXTRAS_DEVICE_ADDRESS = "DEVICE_ADDRESS";
-
-    private TextView mConnectionState;
-    private TextView mDataField;
-    private String mDeviceName;
-    private String mDeviceAddress;
-    private ExpandableListView mGattServicesList;
-    private ArrayList<ArrayList<BluetoothGattCharacteristic>> mGattCharacteristics =
-            new ArrayList<ArrayList<BluetoothGattCharacteristic>>();
-    private boolean mConnected = false;
-    private BluetoothGattCharacteristic mNotifyCharacteristic;
-
-    private final String LIST_NAME = "NAME";
-    private final String LIST_UUID = "UUID";
-
-    private String uuid_service;
-
     private static final int PERMISSION_REQUEST_COARSE_LOCATION = 1;
+
+    private boolean mConnected = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
+        super.onCreate(savedInstanceState);
 
        //Runtime permisson; necessary to work on API 23.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
@@ -105,7 +81,6 @@ public class DeviceScanActivity extends ListActivity {
             if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
                 requestPermissions(new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, PERMISSION_REQUEST_COARSE_LOCATION);
-
 
             }
 
@@ -117,8 +92,8 @@ public class DeviceScanActivity extends ListActivity {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
+
         switch (requestCode) {
             case PERMISSION_REQUEST_COARSE_LOCATION: {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -142,8 +117,8 @@ public class DeviceScanActivity extends ListActivity {
         }
     }
 
-    private void InizializeBluetooth()
-    {
+    private void InizializeBluetooth()  {
+
         // Ensures Bluetooth is available on the device and it is enabled. If not,
         // displays a dialog requesting user permission to enable Bluetooth.
         if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
@@ -158,6 +133,7 @@ public class DeviceScanActivity extends ListActivity {
     }
 
 
+    //check bluetooth and repopulate list/set adapter
     @Override
     protected void onResume() {
         super.onResume();
@@ -179,8 +155,11 @@ public class DeviceScanActivity extends ListActivity {
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
     }
 
+
+    //if the user deny bluetooth, exit from activity
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
         // User chose not to enable Bluetooth.
         if (requestCode == REQUEST_ENABLE_BT && resultCode == Activity.RESULT_CANCELED) {
             finish();
@@ -189,6 +168,8 @@ public class DeviceScanActivity extends ListActivity {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+
+   //clear the adapter
     @Override
     protected void onPause() {
         super.onPause();
@@ -196,8 +177,11 @@ public class DeviceScanActivity extends ListActivity {
         mLeDeviceListAdapter.clear();
     }
 
+
+    //launch service when a device is clicked
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
+
         device = mLeDeviceListAdapter.getDevice(position);
         if (device == null) return;
 
@@ -211,11 +195,13 @@ public class DeviceScanActivity extends ListActivity {
         startActivity(intent);*/
         Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
         bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
+
     }
 
     // Code to manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
+        //what to do when connected to the service
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder service) {
             mBluetoothLeService = ((BluetoothLeService.LocalBinder) service).getService();
@@ -223,10 +209,11 @@ public class DeviceScanActivity extends ListActivity {
                 Log.e("", "Unable to initialize Bluetooth");
                 finish();
             }
-            // Automatically connects to the device upon successful start-up initialization.
+
+            //if connected send a toast message
             if(mBluetoothLeService.connect(device.getAddress()))
             {
-                Toast.makeText(DeviceScanActivity.this, "Conesso a " + device.getName(), Toast.LENGTH_LONG).show();
+                Toast.makeText(DeviceScanActivity.this, "Connected to: " + device.getName(), Toast.LENGTH_LONG).show();
             }
 
         }
@@ -243,6 +230,8 @@ public class DeviceScanActivity extends ListActivity {
     // ACTION_GATT_SERVICES_DISCOVERED: discovered GATT services.
     // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read
     //                        or notification operations.
+
+    //manage the action
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -258,7 +247,7 @@ public class DeviceScanActivity extends ListActivity {
                 //clearUI();
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
                 // Show all the supported services and characteristics on the user interface.
-                displayGattServices(mBluetoothLeService.getSupportedGattServices());
+              //  displayGattServices(mBluetoothLeService.getSupportedGattServices());
                 BluetoothGattService mSVC = mBluetoothLeService.getSupportedGattServices().get(5);
                 // creating UUID
                 UUID uid = UUID.fromString("ee0c1012-8786-40ba-ab96-99b91ac981d8");
@@ -270,7 +259,7 @@ public class DeviceScanActivity extends ListActivity {
         }
     };
 
-    private final ExpandableListView.OnChildClickListener servicesListClickListner =
+   /* private final ExpandableListView.OnChildClickListener servicesListClickListner =
             new ExpandableListView.OnChildClickListener() {
                 @Override
                 public boolean onChildClick(ExpandableListView parent, View v, int groupPosition,
@@ -298,12 +287,12 @@ public class DeviceScanActivity extends ListActivity {
                     }
                     return false;
                 }
-            };
+            };*/
 
     // Demonstrates how to iterate through the supported GATT Services/Characteristics.
     // In this sample, we populate the data structure that is bound to the ExpandableListView
     // on the UI.
-    private void displayGattServices(List<BluetoothGattService> gattServices) {
+    /*private void displayGattServices(List<BluetoothGattService> gattServices) {
         if (gattServices == null) return;
         String uuid = null;
         String unknownServiceString = "Servizio sconosciuto";
@@ -342,7 +331,7 @@ public class DeviceScanActivity extends ListActivity {
             mGattCharacteristics.add(charas);
             gattCharacteristicData.add(gattCharacteristicGroupData);
         }
-
+*/
       /*  SimpleExpandableListAdapter gattServiceAdapter = new SimpleExpandableListAdapter(
                 this,
                 gattServiceData,
@@ -355,7 +344,7 @@ public class DeviceScanActivity extends ListActivity {
                 new int[] { android.R.id.text1, android.R.id.text2 }
         );*/
         //        mGattServicesList.setAdapter(gattServiceAdapter);
-    }
+  //  }
 
     private static IntentFilter makeGattUpdateIntentFilter() {
         final IntentFilter intentFilter = new IntentFilter();
@@ -366,6 +355,7 @@ public class DeviceScanActivity extends ListActivity {
         return intentFilter;
     }
 
+    //scan device. It use some deprecated methods
     private void scanLeDevice(final boolean enable) {
         if (enable) {
             // Stops scanning after a pre-defined scan period.
