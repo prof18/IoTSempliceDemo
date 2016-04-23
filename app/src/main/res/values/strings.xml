@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">IoT Semplice Demo</string>
+
+    <string name="blue_led">Turn on Blue LED</string>
+    <string name="red_led">Turn on Red LED</string>
+</resources>
