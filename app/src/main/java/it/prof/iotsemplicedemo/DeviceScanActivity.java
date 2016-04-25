@@ -161,8 +161,17 @@ public class DeviceScanActivity extends ListActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unbindService(mServiceConnection);
-        mBluetoothLeService = null;
+
+        try {
+
+            unbindService(mServiceConnection);
+            mBluetoothLeService = null;
+
+        } catch (IllegalArgumentException e)
+        {
+
+        }
+
     }
 
 
@@ -387,4 +396,6 @@ public class DeviceScanActivity extends ListActivity {
         TextView deviceName;
         TextView deviceAddress;
     }
+
+    
 }
