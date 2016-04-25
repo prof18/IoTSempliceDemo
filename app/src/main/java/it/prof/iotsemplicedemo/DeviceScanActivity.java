@@ -158,6 +158,13 @@ public class DeviceScanActivity extends ListActivity {
         registerReceiver(mGattUpdateReceiver, makeGattUpdateIntentFilter());
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unbindService(mServiceConnection);
+        mBluetoothLeService = null;
+    }
+
 
     //if the user deny bluetooth, exit from activity
     @Override
@@ -177,6 +184,7 @@ public class DeviceScanActivity extends ListActivity {
     protected void onPause() {
         super.onPause();
         scanLeDevice(false);
+        unregisterReceiver(mGattUpdateReceiver);
         mLeDeviceListAdapter.clear();
     }
 
