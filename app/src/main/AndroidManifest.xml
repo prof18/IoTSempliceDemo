@@ -28,7 +28,6 @@
             </intent-filter>
         </activity>
         <activity android:name="it.prof.iotsemplicedemo.DeviceScanActivity"></activity>
-        <activity android:name="it.prof.iotsemplicedemo.DeviceControlActivity"/>
         <service android:name="it.prof.iotsemplicedemo.BluetoothLeService"/>
     </application>
 

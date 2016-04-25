@@ -5,12 +5,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
-import android.widget.Toast;
+import android.widget.EditText;
 
 public class MainActivity extends AppCompatActivity {
 
     public final static String BLUE_LED_UUID = "ee0c1012-8786-40ba-ab96-99b91ac981d8";
     public final static String RED_LED_UUID = "ee0c1013-8786-40ba-ab96-99b91ac981d8";
+
+    private EditText time;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupButton() {
-        Button button_open_gate = (Button) findViewById(R.id.button_open_gate);
+        Button button_open_gate = (Button) findViewById(R.id.button_led_blue);
         button_open_gate.setOnClickListener(new View.OnClickListener() {
 
             @Override
@@ -39,7 +41,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        Button button_lights_on = (Button) findViewById(R.id.button_lights_on);
+        Button button_lights_on = (Button) findViewById(R.id.button_led_red);
         button_lights_on.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

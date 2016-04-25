@@ -3,4 +3,5 @@
 
     <string name="blue_led">Turn on Blue LED</string>
     <string name="red_led">Turn on Red LED</string>
+    <string name="time_hint">Set Time (Seconds)</string>
 </resources>
