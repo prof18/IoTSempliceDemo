@@ -1,24 +1,7 @@
-/*
- * Copyright (C) 2013 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
 package it.prof.iotsemplicedemo;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.ListActivity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothGattCharacteristic;
@@ -32,12 +15,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
-import android.support.v4.app.ShareCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -49,22 +30,16 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
 import java.util.UUID;
 
-/**
- * Activity for scanning and displaying available Bluetooth LE devices.
- */
+//Scan and connect to a Bluetooth LE device
 public class DeviceScanActivity extends AppCompatActivity {
+
     private MyAdapter mLeDeviceListAdapter;
     private BluetoothAdapter mBluetoothAdapter;
     private boolean mScanning;
@@ -88,7 +63,6 @@ public class DeviceScanActivity extends AppCompatActivity {
     private ArrayList<BluetoothDevice> bDevices;
 
     private SwipeRefreshLayout mSwipeRefreshLayout;
-
     private android.app.AlertDialog alert;
 
     @Override
@@ -107,7 +81,7 @@ public class DeviceScanActivity extends AppCompatActivity {
 
         setupSwipe();
 
-       //Runtime permisson; necessary to work on API 23.
+       //Runtime permission; necessary to work on API 23.
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
             if (this.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -123,10 +97,10 @@ public class DeviceScanActivity extends AppCompatActivity {
 
     }
 
+   //swipe to restart a scan
     public void setupSwipe() {
 
         mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.container);
-       // mSwipeRefreshLayout.canChildScrollUp();
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
 
             @Override
@@ -147,11 +121,11 @@ public class DeviceScanActivity extends AppCompatActivity {
         switch (requestCode) {
             case PERMISSION_REQUEST_COARSE_LOCATION: {
                 if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d("", "coarse location permission granted");
+                    Log.d("", "Coarse location permission granted");
                 } else {
                     final AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                    builder.setTitle("Functionality limited");
-                    builder.setMessage("Since location access has not been granted, this app will not be able to discover beacons when in the background.");
+                    builder.setTitle(R.string.perm_error_title);
+                    builder.setMessage(R.string.perm_error_msg);
                     builder.setPositiveButton(android.R.string.ok, null);
                     builder.setOnDismissListener(new DialogInterface.OnDismissListener() {
 
@@ -162,21 +136,18 @@ public class DeviceScanActivity extends AppCompatActivity {
                     });
                     builder.show();
                 }
-                return;
             }
         }
     }
 
+   //check if bluetooth is enabled and set the adapter. If not, open a dialog.
     private void InizializeBluetooth()  {
 
-        // Ensures Bluetooth is available on the device and it is enabled. If not,
-        // displays a dialog requesting user permission to enable Bluetooth.
         if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT);
         }
 
-        // Initializes Bluetooth adapter.
         final BluetoothManager bluetoothManager =
                 (BluetoothManager) getSystemService(Context.BLUETOOTH_SERVICE);
         mBluetoothAdapter = bluetoothManager.getAdapter();
@@ -188,8 +159,6 @@ public class DeviceScanActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        // Ensures Bluetooth is enabled on the device.  If Bluetooth is not currently enabled,
-        // fire an intent to display a dialog asking the user to grant permission to enable it.
         if (!mBluetoothAdapter.isEnabled()) {
             if (!mBluetoothAdapter.isEnabled()) {
                 Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
@@ -197,7 +166,6 @@ public class DeviceScanActivity extends AppCompatActivity {
             }
         }
 
-        // Initializes list view adapter.
         bDevices = new ArrayList<BluetoothDevice>();
         mLeDeviceListAdapter = new MyAdapter(bDevices,R.layout.row, this);
         mRecyclerView.setAdapter(mLeDeviceListAdapter);
@@ -217,9 +185,7 @@ public class DeviceScanActivity extends AppCompatActivity {
             mBluetoothLeService = null;
 
         } catch (IllegalArgumentException e)
-        {
-
-        }
+        {}
 
     }
 
@@ -251,7 +217,7 @@ public class DeviceScanActivity extends AppCompatActivity {
     }
 
 
-   //clear the adapter
+   //clear the adapter and unregister the receiver
     @Override
     protected void onPause() {
         super.onPause();
@@ -260,20 +226,7 @@ public class DeviceScanActivity extends AppCompatActivity {
         mLeDeviceListAdapter.clear();
     }
 
-
-    /*//launch service when a device is clicked
-    @Override
-    protected void onListItemClick(ListView l, View v, int position, long id) {
-
-        device = mLeDeviceListAdapter.getDevice(position);
-        if (device == null) return;
-
-        Intent gattServiceIntent = new Intent(this, BluetoothLeService.class);
-        bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
-
-    }*/
-
-    // Code to manage Service lifecycle.
+    // Manage Service lifecycle.
     private final ServiceConnection mServiceConnection = new ServiceConnection() {
 
         //what to do when connected to the service
@@ -291,7 +244,7 @@ public class DeviceScanActivity extends AppCompatActivity {
                 Toast.makeText(DeviceScanActivity.this, "Connected to: " + device.getName(),
                         Toast.LENGTH_LONG).show();
 
-               //close activity 2 seconds after the led is off
+               //close activity 1 seconds after the led is off
                 Handler handler = new Handler();
                 Bundle extras1 = getIntent().getExtras();
                 int time1 = extras1.getInt("timeExtra");
@@ -300,14 +253,13 @@ public class DeviceScanActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         android.app.AlertDialog.Builder builder = new android.app.AlertDialog.Builder(DeviceScanActivity.this);
-                        builder.setMessage("Do you want to turn on the LED again?")
-                                .setTitle("Turn on the LED again!")
+                        builder.setMessage(R.string.dialog_message)
+                                .setTitle(R.string.dialog_title)
                                 .setCancelable(false)
-                                .setPositiveButton("ok",
+                                .setPositiveButton("OK",
                                         new DialogInterface.OnClickListener() {
                                             @Override
-                                            public void onClick(DialogInterface dialog,
-                                                                int id) {
+                                            public void onClick(DialogInterface dialog, int id) {
                                                 finish();
                                             }
                                         })
@@ -319,16 +271,13 @@ public class DeviceScanActivity extends AppCompatActivity {
                                             }
                                         });
 
-
-                                        alert = builder.create();
+                        alert = builder.create();
                         alert.show();
                     }
                 };
+
                 handler.postDelayed(r, (time1 + 1)*1000);
             }
-
-
-
         }
 
         @Override
