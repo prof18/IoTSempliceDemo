@@ -1,8 +1,6 @@
 package it.prof.iotsemplicedemo;
 
 import android.content.Intent;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -11,12 +9,14 @@ import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
+    public final static String BLUE_LED_UUID = "ee0c1012-8786-40ba-ab96-99b91ac981d8";
+    public final static String RED_LED_UUID = "ee0c1013-8786-40ba-ab96-99b91ac981d8";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         setupButton();
 
     }
@@ -28,8 +28,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Intent openScan = new Intent(MainActivity.this, DeviceScanActivity.class);
-                startActivity(openScan);
+                Intent blueOn = new Intent(MainActivity.this, DeviceScanActivity.class);
+                blueOn.putExtra("uuidExtra", BLUE_LED_UUID);
+                blueOn.putExtra("timeExtra", 10);
+                startActivity(blueOn);
 
                 /*Intent openGate = new Intent(MainActivity.this, DeviceScanActivity.class);
                 openGate.putExtra("COLOR", 0);  // 0 is red
@@ -42,7 +44,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                Toast.makeText(MainActivity.this, "Button Clicked", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(MainActivity.this, "Button Clicked", Toast.LENGTH_SHORT).show();
+                Intent redOn = new Intent(MainActivity.this, DeviceScanActivity.class);
+                redOn.putExtra("uuidExtra", RED_LED_UUID);
+                redOn.putExtra("timeExtra", 10);
+                startActivity(redOn);
 
             }
         });

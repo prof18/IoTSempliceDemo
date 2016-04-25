@@ -70,6 +70,9 @@ public class DeviceScanActivity extends ListActivity {
 
     private boolean mConnected = false;
 
+    private String uuid;
+    private int time;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
 
@@ -249,15 +252,27 @@ public class DeviceScanActivity extends ListActivity {
                 // Show all the supported services and characteristics on the user interface.
               //  displayGattServices(mBluetoothLeService.getSupportedGattServices());
                 BluetoothGattService mSVC = mBluetoothLeService.getSupportedGattServices().get(5);
+
                 // creating UUID
-                UUID uid = UUID.fromString("ee0c1012-8786-40ba-ab96-99b91ac981d8");
+                Bundle extras = getIntent().getExtras();
+                uuid = extras.getString("uuidExtra");
+                System.out.print(uuid);
+                time = extras.getInt("timeExtra");
+
+                UUID uid = UUID.fromString(uuid);
                 BluetoothGattCharacteristic mCH = mSVC.getCharacteristic(uid);
-                mBluetoothLeService.writeCharacteristic(mCH);
+                mBluetoothLeService.writeCharacteristic(mCH,time);
             } else if (BluetoothLeService.ACTION_DATA_AVAILABLE.equals(action)) {
                 //displayData(intent.getStringExtra(BluetoothLeService.EXTRA_DATA));
             }
         }
     };
+
+    private void setAndWrite() {
+
+
+
+    }
 
    /* private final ExpandableListView.OnChildClickListener servicesListClickListner =
             new ExpandableListView.OnChildClickListener() {
