@@ -10,6 +10,7 @@
     <string name="perm_error_title">Functionality limited</string>
     <string name="dialog_message">Do you want to turn on the LED again?</string>
     <string name="dialog_title">Turn on the LED again!</string>
-    <string name="no_name_device">Dispositivo sconosciuto</string>
-    <string name="no_iblio_device">This isn't an iBLio device!</string>
+    <string name="no_name_device">Unknown Device</string>
+    <string name="no_iblio_device">This isn\'t an iBLio device!</string>
+    <string name="scan_stopped">Scan finished. Swipe down to rescan</string>
 </resources>

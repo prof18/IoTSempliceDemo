@@ -39,7 +39,7 @@ import java.util.UUID;
  * Service for managing connection and data communication with a GATT server hosted on a
  * given Bluetooth LE device.
  *
- * This is an adapted version, from the googlesamples/android-BluetoothLeGatt
+ * This is an adapted version from the googlesamples/android-BluetoothLeGatt
  */
 public class BluetoothLeService extends Service {
     private final static String TAG = BluetoothLeService.class.getSimpleName();

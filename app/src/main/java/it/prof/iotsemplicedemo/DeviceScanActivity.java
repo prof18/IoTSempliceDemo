@@ -320,97 +320,98 @@ public class DeviceScanActivity extends AppCompatActivity {
             if (BluetoothLeService.ACTION_GATT_CONNECTED.equals(action)) {
 
                 mConnected = true;
-                
-            }
-            else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
+
+            } else if (BluetoothLeService.ACTION_GATT_DISCONNECTED.equals(action)) {
 
                 mConnected = false;
-                
+
             } else if (BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED.equals(action)) {
-                
-               //check if the connected device is an iBlio Device and write the characteristic
-               try {
 
-                   BluetoothGattService mSVC = mBluetoothLeService.getSupportedGattServices().get(5);
+                //check if the connected device is an iBlio Device and write the characteristic
+                try {
 
-                   // creating UUID
-                   Bundle extras = getIntent().getExtras();
-                   uuid = extras.getString("uuidExtra");
-                   System.out.print(uuid);
-                   time = extras.getInt("timeExtra");
+                    BluetoothGattService mSVC = mBluetoothLeService.getSupportedGattServices().get(5);
 
-                   UUID uid = UUID.fromString(uuid);
-                   BluetoothGattCharacteristic mCH = mSVC.getCharacteristic(uid);
-                   mBluetoothLeService.writeCharacteristic(mCH,time);
+                    // creating UUID
+                    Bundle extras = getIntent().getExtras();
+                    uuid = extras.getString("uuidExtra");
+                    System.out.print(uuid);
+                    time = extras.getInt("timeExtra");
 
-               } catch (NullPointerException e)
-               {
+                    UUID uid = UUID.fromString(uuid);
+                    BluetoothGattCharacteristic mCH = mSVC.getCharacteristic(uid);
+                    mBluetoothLeService.writeCharacteristic(mCH, time);
 
-                   Toast.makeText(DeviceScanActivity.this, R.string.no_iblio_device, Toast.LENGTH_LONG).show();
+                } catch (NullPointerException e) {
 
-               } catch (IndexOutOfBoundsException e) {
+                    Toast.makeText(DeviceScanActivity.this, R.string.no_iblio_device, Toast.LENGTH_LONG).show();
 
-                   Toast.makeText(DeviceScanActivity.this, R.string.no_iblio_device, Toast.LENGTH_LONG).show();
+                } catch (IndexOutOfBoundsException e) {
 
-               }
-        }
-    };
+                    Toast.makeText(DeviceScanActivity.this, R.string.no_iblio_device, Toast.LENGTH_LONG).show();
 
-    private static IntentFilter makeGattUpdateIntentFilter() {
-        final IntentFilter intentFilter = new IntentFilter();
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
-        intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
-        intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
-        return intentFilter;
-    }
-
-    //scan device. It use some deprecated methods
-    private void scanLeDevice(final boolean enable) {
-        
-        if (enable) {
-            // Stops scanning after a pre-defined scan period.
-            mHandler.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    mScanning = false;
-                    mBluetoothAdapter.stopLeScan(mLeScanCallback);
-                    invalidateOptionsMenu();
                 }
-            }, SCAN_PERIOD);
-
-            mScanning = true;
-            mBluetoothAdapter.startLeScan(mLeScanCallback);
-
-        } 
-        else {
-
-            mScanning = false;
-            mBluetoothAdapter.stopLeScan(mLeScanCallback);
-
+            }
         }
-        invalidateOptionsMenu();
     }
+        ;
 
-    
-    // Device scan callback.
-    private BluetoothAdapter.LeScanCallback mLeScanCallback =
-            new BluetoothAdapter.LeScanCallback() {
+        private static IntentFilter makeGattUpdateIntentFilter() {
+            final IntentFilter intentFilter = new IntentFilter();
+            intentFilter.addAction(BluetoothLeService.ACTION_GATT_CONNECTED);
+            intentFilter.addAction(BluetoothLeService.ACTION_GATT_DISCONNECTED);
+            intentFilter.addAction(BluetoothLeService.ACTION_GATT_SERVICES_DISCOVERED);
+            intentFilter.addAction(BluetoothLeService.ACTION_DATA_AVAILABLE);
+            return intentFilter;
+        }
 
-                @Override
-                public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            //stop swwipe refresh and add a new device
-                            mSwipeRefreshLayout.setRefreshing(false);
-                            mLeDeviceListAdapter.addDevice(device);
-                            mLeDeviceListAdapter.notifyDataSetChanged();
+        //scan device. It use some deprecated methods
+        private void scanLeDevice(final boolean enable) {
 
-                        }
-                    });
-                }
-            };
+            if (enable) {
+                // Stops scanning after a pre-defined scan period.
+                mHandler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        mScanning = false;
+                        mBluetoothAdapter.stopLeScan(mLeScanCallback);
+                        Toast.makeText(DeviceScanActivity.this, R.string.scan_stopped, Toast.LENGTH_SHORT).show();
+                        invalidateOptionsMenu();
+                    }
+                }, SCAN_PERIOD);
+
+                mScanning = true;
+                mBluetoothAdapter.startLeScan(mLeScanCallback);
+
+            } else {
+
+                mScanning = false;
+                mBluetoothAdapter.stopLeScan(mLeScanCallback);
+
+            }
+            invalidateOptionsMenu();
+        }
+
+
+        // Device scan callback.
+        private BluetoothAdapter.LeScanCallback mLeScanCallback =
+                new BluetoothAdapter.LeScanCallback() {
+
+                    @Override
+                    public void onLeScan(final BluetoothDevice device, int rssi, byte[] scanRecord) {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                //stop swwipe refresh and add a new device
+                                mSwipeRefreshLayout.setRefreshing(false);
+                                mLeDeviceListAdapter.addDevice(device);
+                                mLeDeviceListAdapter.notifyDataSetChanged();
+
+
+                            }
+                        });
+                    }
+                };
 
     //adapter for the racycler view
     private class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
