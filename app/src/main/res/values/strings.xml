@@ -1,6 +1,6 @@
-<resources>
+<resources xmlns:http="http://schemas.android.com/tools">
     <string name="app_name">IoT Semplice Demo</string>
-
+    <string name="action_info">About</string>
     <string name="blue_led">Turn on Blue LED</string>
     <string name="red_led">Turn on Red LED</string>
     <string name="time_hint">Set Time (Seconds)</string>
@@ -13,4 +13,8 @@
     <string name="no_name_device">Unknown Device</string>
     <string name="no_iblio_device">This isn\'t an iBLio device!</string>
     <string name="scan_stopped">Scan finished. Swipe down to rescan</string>
+    <string name="info_text">This is a simple app that shows how to turn on the led of
+        \"IoT Semplice\" using Bluetooth Low Energy.&lt;br /&gt;&lt;br /&gt;You can find
+        the source code on </string>
+    <string name="author">&lt;br /&gt;&lt;br /&gt;Written by Marco Gomiero</string>
 </resources>
