@@ -1,5 +1,5 @@
 # IoTSempliceDemo
-This is a simple app that shows how to turn on the led of <a href="http://www.iotsemplice.com/">"IoT Semplice"</a>.
+This is a simple app that shows how to turn on the led of "IoT Semplice", a board for Internet Of Things.
 <img src="https://github.com/prof18/IoTSempliceDemo/blob/master/screen_1.jpg" width="30%" height="30%" align="right"</img>
 
 #How it Works
@@ -10,3 +10,6 @@ The main purpose is to show (using led) how to deal with "IoT Semplice" ports.
 
 The idea of this app was developed during 
 <a href="http://it.droidcon.com/2016/hackathon-droidcon-italy/">Droidcon Italy 2016 Hackathon.</a>
+
+More information about IoTSemplice can be found <a href="http://www.cosma369.it/categoria-prodotto/iotsemplice/">here</a> and 
+<a href="https://sites.google.com/site/iblionet/">here </a>.
